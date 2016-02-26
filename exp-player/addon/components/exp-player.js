@@ -5,16 +5,30 @@ export default Ember.Component.extend({
     layout: layout,
     store: Ember.inject.service('store'),
 
-    frames: null,
+    experiment: null,
     frameIndex: null,
     _last: null,
-    ctx: {
-        data: {}
-    },
+    _session: null,
     expData: {},
     onInit: function() {
         this.set('frameIndex', this.get('frameIndex') || 0);  // TODO: Is this necessary?
     }.on('didReceiveAttrs'),
+    frames: Ember.computed('experiment', function() {
+        return this.get('experiment.structure');
+    }),
+    session: Ember.computed('experiment', function() {
+        var session = this.get('store').createRecord(this.get('experiment.sessionCollectionId'), {
+            experimentId: this.get('experiment.id'),
+            profileId: 'tester0.prof1',
+            profileVersion: '',
+            softwareVersion: ''
+        });
+        this.get('experiment').getCurrentVersion().then(function(versionId) {
+            session.set('experimentVersion', versionId);
+        });
+        this.set('_session', session);
+        return session;
+    }),
     currentFrame: Ember.computed('frames', 'frameIndex', function() {
         var frames = this.get('frames') || [];
         var frameIndex = this.get('frameIndex');
@@ -40,7 +54,7 @@ export default Ember.Component.extend({
     }),
     currentFrameData: Ember.computed('currentFrame', function() {
         var currentFrame = this.get('currentFrame');
-        var context = this.get('ctx');
+        var context = this.get('expData');
 
         if (!context[currentFrame.id]) {
             context[currentFrame.id] = null;
@@ -49,8 +63,9 @@ export default Ember.Component.extend({
     }),
     currentFrameCtx: Ember.computed('currentFrame', function() {
         // deepcopy global context
-        var ctx = Ember.copy(this.get('ctx'));
+        var ctx = Ember.copy(this.get('expData'));
         ctx.frameIndex = this.get('frameIndex');
+        ctx.sessionId = this.get('session.id');
 
         return ctx;
     }),
@@ -67,7 +82,9 @@ export default Ember.Component.extend({
                 expData: this.get('expData'),
                 parameters: {}  // TODO: Future field
             };
-            this.sendAction('saveHandler', payload);  // call the passed-in action with payload
+            var session = this.get('session');
+            session.setProperties(payload);
+            return session.save();
         },
         next() {
             console.log('next');
