@@ -4,12 +4,13 @@ import parseExperiment from '../utils/parse-experiment';
 
 export default Ember.Component.extend({
     layout: layout,
+    store: Ember.inject.service('store'),
 
     experiment: null, // Experiment model
     frames: null,
-
     frameIndex: null,  // Index of the currently active frame
 
+    _session: null,
     expData: {},  // Temporarily store data collected until we sent to server at end
 
     init: function() {
@@ -18,7 +19,19 @@ export default Ember.Component.extend({
         var frameConfigs = parseExperiment(this.get('experiment.structure'));
         this.set('frames', frameConfigs);  // When player loads, convert structure to list of frames
     },
-
+    session: Ember.computed('experiment', function() {
+        var session = this.get('store').createRecord(this.get('experiment.sessionCollectionId'), {
+            experimentId: this.get('experiment.id'),
+            profileId: 'tester0.prof1',
+            profileVersion: '',
+            softwareVersion: ''
+        });
+        this.get('experiment').getCurrentVersion().then(function(versionId) {
+            session.set('experimentVersion', versionId);
+        });
+        this.set('_session', session);
+        return session;
+    }),
     currentFrameConfig: Ember.computed('frames', 'frameIndex', function() {
         var frames = this.get('frames') || [];
         var frameIndex = this.get('frameIndex');
@@ -51,7 +64,9 @@ export default Ember.Component.extend({
                 expData: this.get('expData'),
                 sequence: sequence
             };
-            this.sendAction('saveHandler', payload);  // call the passed-in action with payload
+            var session = this.get('session');
+            session.setProperties(payload);
+            return session.save();
         },
         next() {
             console.log('next');
