@@ -14,10 +14,14 @@ export default Ember.Component.extend(FullScreen, {
     store: Ember.inject.service(),
     getCurrentUser: Ember.inject.service(),
     pastSessions: Ember.computed('experiment', function() {
-        return this.get('getCurrentUser').load().then(function([account, profile]) {
+        return this.get('getCurrentUser').load().then(([, profile]) => {
+            var profileId = profile.get('profileId');
+            var experimentId = this.get('experiment.id');
             return this.get('store').queryRecord(this.get('experiment.sessionCollectionId'), {
-                experimentId: this.get('experiment.id'),
-                profileId: profile.get('id')
+                q: [
+                    `experimentId:${experimentId}`,
+                    `profileId:${profileId}`
+                ]
             });
         });
     }),
