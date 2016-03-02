@@ -166,11 +166,11 @@ export default ExpFrameBaseComponent.extend({
             }
         };
     }),
-    currentSessionsCompleted: Ember.computed('context', function() {
-        return (this.get('context.pastSessions') || []).length;
+    currentSessionsCompleted: Ember.computed('frameContext', function() {
+        return (this.get('frameContext.pastSessions') || []).length;
     }),
-    currentDaysSessionsCompleted: Ember.computed('context', function() {
-        var pastSessionDates = this.get('context.pastSessions').map((session) => {
+    currentDaysSessionsCompleted: Ember.computed('frameContext', function() {
+        var pastSessionDates = this.get('frameContext.pastSessions').map((session) => {
             return moment(session.get('createdOn'));
         });
         var minDate = moment.min(pastSessionDates);

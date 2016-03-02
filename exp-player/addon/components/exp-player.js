@@ -53,7 +53,7 @@ export default Ember.Component.extend(FullScreen, {
         return componentName;
     }),
 
-    context: Ember.computed('pastSessions', function() {
+    currentFrameContext: Ember.computed('pastSessions', function() {
         return {
             pastSessions: this.get('pastSessions')
         };
