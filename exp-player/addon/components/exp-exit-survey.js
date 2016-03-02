@@ -1,20 +1,22 @@
 import Ember from 'ember';
 
+import moment from 'moment';
+
 import ExpFrameBaseComponent from 'exp-player/components/exp-frame-base';
 import layout from '../templates/components/exp-exit-survey';
 
 const defaultSchema = {
     schema: {
-        title:"Post-study survey",
-        description:"How was your experience?",
-        type:"object",
+        title: "Post-study survey",
+        description: "How was your experience?",
+        type: "object",
         properties: {
             birthdate: {
-                title:"Please confirm your child's birthdate: *"
+                title: "Please confirm your child's birthdate: *"
             },
             feedback: {
-                type:"string",
-                title:"Your feedback:",
+                type: "string",
+                title: "Your feedback:"
             },
             privacy: {
                 type: "string",
@@ -30,7 +32,7 @@ const defaultSchema = {
                 manualEntry: false,
                 validator: "required-field",
                 message: "Please provide a complete and valid birthday.",
-                helper: "We ask again just to check for typos during registration or people accidentally selecting a different child at the start of the study.",
+                helper: "We ask again just to check for typos during registration or people accidentally selecting a different child at the start of the study."
             },
             feedback: {
                 type: "textarea",
@@ -45,14 +47,14 @@ const defaultSchema = {
                 message: "Please select a privacy level for your video."
             }
         }
-    }   
+    }
 };
 const emailOptOutSchema = {
     schema: {
-        type:"object",
+        type: "object",
         properties: {
             emailOptOut: {
-                title:"You are currently signed up to recieve email reminders about this study."
+                title: "You are currently signed up to recieve email reminders about this study."
             }
         }
     },
@@ -70,7 +72,7 @@ const emailOptOutSchema = {
                 }
             }
         }
-    }  
+    }
 };
 
 export default ExpFrameBaseComponent.extend({
@@ -95,6 +97,20 @@ export default ExpFrameBaseComponent.extend({
                     type: 'jsonschema',
                     description: 'JSON-schema defining second form.',
                     default: emailOptOutSchema
+                },
+                idealSessionsCompleted: {
+                    type: 'integer',
+                    default: 3
+                },
+                idealDaysSessionsCompleted: {
+                    type: 'integer',
+                    default: 14
+                },
+                exitMessage: {
+                    type: 'string'
+                },
+                exitThankYou: {
+                    type: 'string'
                 }
             },
             required: ['id']
@@ -110,7 +126,6 @@ export default ExpFrameBaseComponent.extend({
     },
     formSchema: Ember.computed('form', {
         get() {
-            var root = this;
             var newOptions = this.get('form.options');
             newOptions.form = {
                 buttons: {
@@ -123,37 +138,47 @@ export default ExpFrameBaseComponent.extend({
             };
             return {
                 schema: this.get('form.schema'),
-                options: newOptions        
+                options: newOptions
             };
         },
         set(_, value) {
             this.set('formSchema', value);
             return value;
         }
-        
     }),
     section1: true,
     formData: [],
     formActions: Ember.computed(function() {
         var root = this;
         return {
-            update: function () {
+            update: function() {
                 this.refreshValidationState(true);
                 if (this.isValid(true)) {
-                   root.set('formData', this.getValue());
-                   root.set('section1', false);
+                    root.set('formData', this.getValue());
+                    root.set('section1', false);
                 }
             },
             finish: function() {
                 var formData = root.get('formData');
                 Ember.merge(formData, this.getValue());
                 root.set('formData', formData);
-                console.log('Post-study survey complete.')
                 root.actions.next();
             }
-        }
+        };
+    }),
+    currentSessionsCompleted: Ember.computed('context', function() {
+        return (this.get('context.pastSessions') || []).length;
+    }),
+    currentDaysSessionsCompleted: Ember.computed('context', function() {
+        var pastSessionDates = this.get('context.pastSessions').map((session) => {
+            return moment(session.get('createdOn'));
+        });
+        var minDate = moment.min(pastSessionDates);
+        var maxDate = moment.max(pastSessionDates);
+
+        return maxDate.diff(minDate, 'days');
     }),
     progressValue: Ember.computed('currentSessionsCompleted', 'idealSessionsCompleted', function() {
-        return (this.get('currentSessionsCompleted')/this.get('idealSessionsCompleted')) * 100;
+        return (this.get('currentSessionsCompleted') / this.get('idealSessionsCompleted')) * 100;
     })
 });
