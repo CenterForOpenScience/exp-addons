@@ -11,6 +11,17 @@ export default Ember.Component.extend(FullScreen, {
     session: null,
     frames: null,
 
+    store: Ember.inject.service(),
+    getCurrentUser: Ember.inject.service(),
+    pastSessions: Ember.computed('experiment', function() {
+        return this.get('getCurrentUser').load().then(function([account, profile]) {
+            return this.get('store').queryRecord(this.get('experiment.sessionCollectionId'), {
+                experimentId: this.get('experiment.id'),
+                profileId: profile.get('id')
+            });
+        });
+    }),
+
     frameIndex: null,  // Index of the currently active frame
 
     displayFullscreen: false,
@@ -40,6 +51,12 @@ export default Ember.Component.extend(FullScreen, {
             console.warn(`No component named ${componentName} is registered.`);
         }
         return componentName;
+    }),
+
+    context: Ember.computed('pastSessions', function() {
+        return {
+            pastSessions: this.get('pastSessions')
+        };
     }),
 
     actions: {

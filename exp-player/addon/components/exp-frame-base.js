@@ -29,6 +29,8 @@ export default Ember.Component.extend({
     frameConfig: null,
     eventTimings: null,
 
+    context: null,
+
     session: null,
     didReceiveAttrs: function() {
         this._super(...arguments);
