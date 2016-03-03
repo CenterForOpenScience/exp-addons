@@ -145,6 +145,7 @@ export default ExpFrameBaseComponent.extend({
             this.set('formSchema', value);
             return value;
         }
+
     }),
     section1: true,
     formData: [],
@@ -162,6 +163,7 @@ export default ExpFrameBaseComponent.extend({
                 var formData = root.get('formData');
                 Ember.merge(formData, this.getValue());
                 root.set('formData', formData);
+                console.log('Post-study survey complete.');
                 root.actions.next();
             }
         };
