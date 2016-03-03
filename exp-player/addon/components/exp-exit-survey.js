@@ -170,6 +170,9 @@ export default ExpFrameBaseComponent.extend({
         return (this.get('frameContext.pastSessions') || []).length;
     }),
     currentDaysSessionsCompleted: Ember.computed('frameContext', function() {
+        // Warning, this implementation may be inaccurate1
+        // TODO, figure out what the client's expected behavior is here and resolve
+        // https://openscience.atlassian.net/browse/LEI-111
         var pastSessionDates = this.get('frameContext.pastSessions').map((session) => {
             return moment(session.get('createdOn'));
         });
