@@ -15,8 +15,8 @@ const defaultSchema = {
                 title: "Please confirm your child's birthdate: *"
             },
             feedback: {
-                type: "string",
-                title: "Your feedback:"
+                type:"string",
+                title:"Your feedback:"
             },
             privacy: {
                 type: "string",
@@ -163,7 +163,7 @@ export default ExpFrameBaseComponent.extend({
                 Ember.merge(formData, this.getValue());
                 root.set('formData', formData);
                 console.log('Post-study survey complete.');
-                root.sendAction('next');
+                root.actions.next.apply(root);
             }
         };
     }),

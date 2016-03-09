@@ -114,5 +114,5 @@ export default Ember.Component.extend({
         previous() {
             this.sendAction('previous');
         }
-    },
+    }
 });

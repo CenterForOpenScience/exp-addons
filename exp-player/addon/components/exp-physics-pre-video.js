@@ -1,11 +1,11 @@
 import ExpFrameBaseComponent from 'exp-player/components/exp-frame-base';
-import layout from 'exp-player/templates/components/<%= dasherizedModuleName %>';
+import layout from 'exp-player/templates/components/exp-physics-pre-video';
 
 export default ExpFrameBaseComponent.extend({
     layout: layout,
-    type: '<%= dasherizedModuleName %>',
+    type: 'exp-physics-pre-video',
     meta: {
-        name: '<%= classifiedModuleName %>',
+        name: 'ExpPhysicsPreVideo',
         description: 'TODO: a description of this frame goes here.',
         parameters: {
             type: 'object',

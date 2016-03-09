@@ -11,22 +11,7 @@ export default Ember.Component.extend(FullScreen, {
     session: null,
     frames: null,
 
-    store: Ember.inject.service(),
-    getCurrentUser: Ember.inject.service(),
-    pastSessions: Ember.computed('experiment', function() {
-        return this.get('getCurrentUser').load().then(([, profile]) => {
-            var profileId = profile.get('profileId');
-            var experimentId = this.get('experiment.id');
-            return this.get('store').queryRecord(this.get('experiment.sessionCollectionId'), {
-                q: [
-                    `experimentId:${experimentId}`,
-                    `profileId:${profileId}`
-                ]
-            });
-        });
-    }),
-
-    frameIndex: null,  // Index of the currently active frame
+    frameIndex: 0,  // Index of the currently active frame
 
     displayFullscreen: false,
     fullScreenElementId: 'experiment-player',
@@ -35,7 +20,6 @@ export default Ember.Component.extend(FullScreen, {
 
     init: function() {
         this._super(...arguments);
-        this.set('frameIndex', 0);
         var frameConfigs = parseExperiment(this.get('experiment.structure'));
         this.set('frames', frameConfigs);  // When player loads, convert structure to list of frames
         this.set('displayFullscreen', this.get('experiment.displayFullscreen') || false);  // Choose whether to display this experiment fullscreen (default false)
@@ -79,7 +63,10 @@ export default Ember.Component.extend(FullScreen, {
                 expData: this.get('expData'),
                 sequence: sequence
             };
-            this.sendAction('saveHandler', payload);  // call the passed-in action with payload
+            var exitUrl = this.get('experiment.exitUrl');
+            this.sendAction('saveHandler', [payload,  () => {
+                window.location = exitUrl;
+            }]);  // call the passed-in action with payload
         },
         next() {
             console.log('next');
