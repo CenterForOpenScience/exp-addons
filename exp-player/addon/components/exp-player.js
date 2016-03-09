@@ -9,6 +9,7 @@ export default Ember.Component.extend(FullScreen, {
 
     experiment: null, // Experiment model
     session: null,
+    pastSessions: null,
     frames: null,
 
     frameIndex: 0,  // Index of the currently active frame
