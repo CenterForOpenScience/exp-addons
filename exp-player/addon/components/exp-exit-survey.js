@@ -168,7 +168,11 @@ export default ExpFrameBaseComponent.extend({
         };
     }),
     currentSessionsCompleted: Ember.computed('frameContext', function() {
-        return (this.get('frameContext.pastSessions') || []).length;
+        var pastSessions = this.get('frameContext.pastSessions');
+        if (pastSessions) {
+            return pastSessions.get('length');
+        }
+        return 0;
     }),
     currentDaysSessionsCompleted: Ember.computed('frameContext', function() {
         // Warning, this implementation may be inaccurate1
@@ -180,7 +184,7 @@ export default ExpFrameBaseComponent.extend({
         var minDate = moment.min(pastSessionDates);
         var maxDate = moment.max(pastSessionDates);
 
-        return maxDate.diff(minDate, 'days');
+        return maxDate.diff(minDate, 'days') + 1;
     }),
     progressValue: Ember.computed('currentSessionsCompleted', 'idealSessionsCompleted', function() {
         return (this.get('currentSessionsCompleted') / this.get('idealSessionsCompleted')) * 100;

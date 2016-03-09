@@ -1,9 +1,11 @@
 import Ember from 'ember';
 
 export default Ember.Mixin.create({
-    setupController(controller, experiment) {
-        this._super(controller, experiment);
-        this.store.find(experiment.get(experiment.get('sessionCollectionId'))).then((sessions) => {
+    setupController(controller, model) {
+        this._super(controller, model);
+        var experiment = controller.get('experiment') || model;
+
+        this.store.findAll(experiment.get('sessionCollectionId')).then((sessions) => {
             controller.set('pastSessions', sessions);
         });
     }
