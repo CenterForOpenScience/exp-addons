@@ -9,6 +9,7 @@ export default Ember.Component.extend(FullScreen, {
 
     experiment: null, // Experiment model
     session: null,
+    pastSessions: null,
     frames: null,
 
     frameIndex: 0,  // Index of the currently active frame
@@ -39,6 +40,12 @@ export default Ember.Component.extend(FullScreen, {
             console.warn(`No component named ${componentName} is registered.`);
         }
         return componentName;
+    }),
+
+    currentFrameContext: Ember.computed('pastSessions', function() {
+        return {
+            pastSessions: this.get('pastSessions')
+        };
     }),
 
     actions: {
