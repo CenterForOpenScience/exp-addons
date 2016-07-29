@@ -1,0 +1,9 @@
+<!-- A slight hack due to weirdness in routing -->
+{{ experiment-detail
+    experiment=(if experiment experiment model)
+    sessions=sessions
+
+    onDelete=(action 'onDelete')
+    onClone=(action 'onClone')
+    editComponents=(action 'editComponents')
+}}

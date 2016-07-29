@@ -1,0 +1,27 @@
+---
+language: node_js
+node_js:
+  - "4.3.2"
+
+sudo: false
+
+cache:
+  directories:
+    - node_modules
+
+before_install:
+  - cp .env-travis .env
+  - export PATH=/usr/local/phantomjs-2.0.0/bin:$PATH
+  - "npm config set spin false"
+  - "npm install -g npm@^2"
+
+install:
+  - npm install -g bower
+  - npm install -g ember-cli
+  - npm install
+  - bower install
+
+script:
+  - npm run lint
+  - ember build
+  - ember test --path dist

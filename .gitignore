@@ -15,5 +15,19 @@
 /libpeerconnection.log
 npm-debug.log
 testem.log
+.env
+.env-local
+env
+
+__pycache__/
+
+schemas/*
+public/VideoRecorder.swf
+
+scripts/admins.json
+
+
+docs/_build
+docs/build
 
 exp-player/public/VideoRecorder.swf
