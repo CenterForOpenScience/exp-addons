@@ -13,6 +13,7 @@
 @import "components/isp-radio-group";
 @import "components/exp-card-sort";
 @import "components/exp-rating-form";
+@import "components/exp-thank-you";
 
 
 .exp-text-large {
@@ -35,14 +36,6 @@
 
 .exp-controls {
     margin: 5px;
-}
-
-.margin-top-sm {
-    margin-top: 25px;
-}
-
-.margin-top-lg {
-    margin-top: 75px;
 }
 
 #expContainer {
