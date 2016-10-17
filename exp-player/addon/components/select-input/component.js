@@ -5,5 +5,6 @@ import layout from './template';
 export default Ember.Component.extend({
   layout,
   options: null,
-  value: null
+  value: null,
+  translate: true
 });

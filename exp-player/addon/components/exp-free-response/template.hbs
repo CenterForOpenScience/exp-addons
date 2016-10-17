@@ -16,7 +16,12 @@
       {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=q3}}{{/textarea}}
       <p class="text-muted">{{diff3}}</p>
     {{/bs-form-group}}
+    {{#bs-form-group}}
+      <label>{{t 'survey.sections.2.questions.14.label'}}</label>
+      {{select-input options=times value=q4 translate=false}}
+    {{/bs-form-group}}
   {{/bs-form}}
+  <br>
 </div>
 <div class="row exp-controls">
     <button class="btn btn-default" {{ action 'previous' }}>
