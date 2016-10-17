@@ -3,6 +3,7 @@ import ExpFrameBaseComponent from 'exp-player/components/exp-frame-base';
 import layout from './template';
 import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
+import moment from 'moment';
 
 
 function getLength(value) {
@@ -21,7 +22,8 @@ var presence = validator('presence', {
 const Validations = buildValidations({
     q1: presence,
     q2: presence,
-    q3: presence
+    q3: presence,
+    q4: presence
 });
 
 export default ExpFrameBaseComponent.extend(Validations, {
@@ -46,12 +48,24 @@ export default ExpFrameBaseComponent.extend(Validations, {
         message = message.replace("0", length.toString());
         return message;
     }),
+    times: Ember.computed(function() {
+        var times = [];
+        for (var i=0; i < 24; i++) {
+            var date = new Date(2016, 10, 17, i, 0, 0);
+            // TODO: Handle missing moment locales: amharic, urdu, runyakore, luganda,             longDateFormat : {
+            moment.locale(this.get('i18n.locale'));
+            times.push(moment(date).format('LT'));
+        }
+        return times;
+    }),
+    q4: null,
 
-    responses: Ember.computed('q1', 'q2', 'q3', function() {
+    responses: Ember.computed('q1', 'q2', 'q3', 'q4', function() {
         return {
             q1: this.get('q1'),
             q2: this.get('q2'),
-            q3: this.get('q3')
+            q3: this.get('q3'),
+            q4: this.get('q4')
         };
     }),
 
@@ -85,6 +99,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
                         },
                         q3: {
                             type: 'string'
+                        },
+                        q4: {
+                            type: 'string'
                         }
                     }
                 }
@@ -103,5 +120,6 @@ export default ExpFrameBaseComponent.extend(Validations, {
         this.set('q1', responses.q1);
         this.set('q2', responses.q2);
         this.set('q3', responses.q3);
+        this.set('q4', responses.q4);
     }
 });
