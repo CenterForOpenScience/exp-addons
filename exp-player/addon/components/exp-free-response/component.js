@@ -50,9 +50,13 @@ export default ExpFrameBaseComponent.extend(Validations, {
     }),
     times: Ember.computed(function() {
         var times = [];
-        for (var i=0; i < 24; i++) {
+        for (var i=0; i <= 24; i++) {
             var date = new Date(2016, 10, 17, i, 0, 0);
-            // TODO: Handle missing moment locales: amharic, urdu, runyakore, luganda,             longDateFormat : {
+            var locale = this.get('i18n.locale');
+            if (locale in config.localeTimeFormats) {
+                // Add locale information not specified by moment.js
+                moment.updateLocale(locale, config.localeTimeFormats[locale])
+            }
             moment.locale(this.get('i18n.locale'));
             times.push(moment(date).format('LT'));
         }
