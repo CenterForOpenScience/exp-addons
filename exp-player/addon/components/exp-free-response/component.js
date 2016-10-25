@@ -132,6 +132,15 @@ export default ExpFrameBaseComponent.extend(Validations, {
         }
     },
     actions: {
+        onOpen(obj) {
+            this.obj = obj;
+            Ember.run.later(this, function() {
+                let itemList = document.getElementById('ember-power-select-options-' + this.obj.uniqueId);
+                let item = itemList.querySelectorAll('[data-option-index]').item(12);
+                let topHeight = item.offsetTop - itemList.offsetTop;
+                itemList.scrollTop = topHeight;
+            }, 200);
+        },
         continue() {
             if (this.get('allowNext')) {
                 this.send('next');
