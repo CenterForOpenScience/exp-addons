@@ -43,8 +43,12 @@ export default DS.Model.extend(JamModel, {
 
     profileById(profileId) {
         // Scan the list of profiles and gets first one with matching ID (else undefined). Assumes profileIds are unique.
-        const profiles = this.get('profiles') || [];
-        return profiles.find((item) => item.get('profileId') === profileId);
+        var profiles = this.get('profiles') || [];
+        var getProfile = function (item) {
+            return item.get('profileId') === profileId;
+        };
+
+        return profiles.filter(getProfile)[0];
     },
     pastSessionsFor(experiment, profile, isCompleted) {
         var profileId = Ember.get(profile, 'profileId');
