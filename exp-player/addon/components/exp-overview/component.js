@@ -63,7 +63,7 @@ const questions = [
         scale: [
             {label: 'survey.sections.1.questions.2.options.male', value: 1},
             {label: 'survey.sections.1.questions.2.options.female', value: 2},
-            {label: 'survey.sections.1.questions.2.options.other', value: 3},
+            {label: 'survey.sections.1.questions.2.options.other', value: 3, sensitive: true},
             {label: 'survey.sections.1.questions.2.options.na', value: 4}
         ],
         value: null
