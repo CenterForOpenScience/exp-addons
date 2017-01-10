@@ -16,16 +16,33 @@ function range(start, stop) {
 
 var generateValidators = function (questions) {
     var validators = {};
-    var presence = validator('presence', {
+    const presence = validator('presence', {
         presence: true,
         ignoreBlank: true,
         message: 'This field is required'
     });
-    for (var q = 0; q < questions.length; q++) {
-        var isOptional = 'optional' in questions[q] && questions[q].optional;
-        if (!isOptional) {
-            var key = 'questions.' + q + '.value';
-            validators[key] = presence;
+    // We can't exclude the question from validation entirely without container access (to query currentUser service)
+    // ...so instead we make sure the validator for that question is silently disabled.
+    const sensitivePresence = validator('presence', {
+        presence: true,
+        disabled() {
+            return this.get('currentUser.isSensitive');
+        },
+        ignoreBlank: true,
+        message: 'This field is required'
+    });
+
+    for (let q = 0; q < questions.length; q++) {
+        const item = questions[q];
+        // Exclude the question from validators if it is optional (no validation needed), or sensitive (not
+        // considered to exist for the purposes of this user)
+        if (!item.optional) {
+            let key = 'questions.' + q + '.value';
+            if (item.sensitive) {
+                validators[key] = sensitivePresence;
+            } else {
+                validators[key] = presence;
+            }
         }
     }
     return validators;
@@ -55,7 +72,8 @@ const questions = [
         question: 'survey.sections.1.questions.3.label',
         keyName: 'Ethnicity',
         type: 'input',
-        value: null
+        value: null,
+        sensitive: true
     },
     {
         question: 'survey.sections.1.questions.4.label',
@@ -158,16 +176,27 @@ const questions = [
 const Validations = buildValidations(generateValidators(questions));
 
 export default ExpFrameBaseComponent.extend(Validations, {
+    currentUser: Ember.inject.service(),
+
     type: 'exp-overview',
     layout: layout,
-    questions: questions,
+    questions: Ember.computed('currentUser.isSensitive', function () {
+        // Remove sensitive questions from the list of things to render (validators for them are disabled separately)
+        const isSensitiveSite = this.get('currentUser.isSensitive');
+        if (isSensitiveSite) {
+            return questions.filter(item => !item.sensitive);
+        } else {
+            return questions;
+        }
+    }),
     pageNumber: 1,
 
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
 
     showOptional: Ember.computed('questions.9.value', function () {
-        return this.questions[9].value === 1;
+        // TODO: This is position-sensitive and many be altered by removing the ethnicity question
+        return this.get('questions')[9].value === 1;
     }),
     responses: Ember.computed(function () {
         var questions = this.get('questions');
@@ -176,6 +205,8 @@ export default ExpFrameBaseComponent.extend(Validations, {
             var keyName = questions[i].keyName;
             // Questions with string values that should get serialized to integers (since select-input returns a string)
             // (e.g. "16" --> 16)
+
+            // FIXME: Will be sensitive to the "hide question" mechanism- indices will change
             var parseIntResponses = [0, 1, 7];
             if (parseIntResponses.includes(i)) {
                 responses[keyName] = parseInt(questions[i].value);
