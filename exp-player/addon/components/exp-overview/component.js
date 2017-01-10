@@ -194,24 +194,27 @@ export default ExpFrameBaseComponent.extend(Validations, {
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
 
-    showOptional: Ember.computed('questions.9.value', function () {
-        // TODO: This is position-sensitive and many be altered by removing the ethnicity question
-        return this.get('questions')[9].value === 1;
+    showOptional: Ember.computed('questions.@each.value', function () {
+        // The exact position of this question will vary because this survey is modified for sensitive locales
+        const questions = this.get('questions');
+        const item = questions.find(item => item.keyName === 'ReligionYesNo');
+        return item.value === 1;
     }),
     responses: Ember.computed(function () {
-        var questions = this.get('questions');
-        var responses = {};
-        for (var i = 0; i < questions.length; i++) {
-            var keyName = questions[i].keyName;
-            // Questions with string values that should get serialized to integers (since select-input returns a string)
-            // (e.g. "16" --> 16)
+        const questions = this.get('questions');
+        let responses = {};
 
-            // FIXME: Will be sensitive to the "hide question" mechanism- indices will change
-            var parseIntResponses = [0, 1, 7];
-            if (parseIntResponses.includes(i)) {
-                responses[keyName] = parseInt(questions[i].value);
+        // Questions with string values that should get serialized to integers (since select-input returns a string)
+        //   (e.g. "16" --> 16)
+        const specialCaseResponses = ['Age', 'Gender', 'Residence'];
+        for (let i = 0; i < questions.length; i++) {
+            const item = questions[i];
+            const keyName = item.keyName;
+
+            if (specialCaseResponses.includes(keyName)) {
+                responses[keyName] = parseInt(item.value);
             } else {
-                responses[keyName] = questions[i].value;
+                responses[keyName] = item.value;
             }
         }
         return responses;
