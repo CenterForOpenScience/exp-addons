@@ -198,6 +198,13 @@ const TEN_POINT_SCALE = [
     {label: 9, value: 9},
     {label: 10, value: 10}
 ];
+
+// Serialized-value keyName(s) that are to be excluded from a locale identified as sensitive.
+//   Anything in this list will be removed from validation, display, and serialization to server. Other keys should
+//   not be affected.
+const SENSITIVE_EXCLUSIONS = ['ReligionScale4', 'ReligionScale9', 'ReligionScale10', 'ReligionScale11',
+    'ReligionScale13', 'ReligionScale14', 'ReligionScale15', 'ReligionScale17'];
+
 const SEVEN_POINT_SCALE = TEN_POINT_SCALE.slice(1, 8);
 const NINE_POINT_SCALE = TEN_POINT_SCALE.slice(1, 10);
 
@@ -210,13 +217,27 @@ var generateValidators = function (questions) {
             var isOptional = questions[i]['items'][item].optional;
             if (!isOptional) {
                 var key = `questions.${i}.items.${item}.value`;
+                var sensitive = `questions.${i}.items.${item}.sensitive`;
                 if (!pages[page]) {
                     pages[page] = [];
                 }
                 pages[page].push(key);
-                validators[key] = validator('presence', {
-                    presence: true
-                });
+
+                // If this question is identified as sensitive, ensure it is omitted from validation if the user is
+                //   in a locale marked as sensitive (we can't remove the question outright yet because this function
+                //   lacks container access for service injection- a bare function can't check whether the studyID is sensitive)
+                if (sensitive) {
+                    validators[key] = validator('presence', {
+                        presence: true,
+                        disabled() {
+                            return this.get('currentUser.isSensitive');
+                        }
+                    });
+                } else {
+                    validators[key] = validator('presence', {
+                        presence: true
+                    });
+                }
             }
         }
     }
@@ -243,7 +264,10 @@ var generateSchema = function (data) {
         var ret = {
             description: data.items[i],
             keyName: keyName,
-            value: null
+            value: null,
+            // When constructing schema, mark certain questions as "sensitive", to be hidden from display or validation
+            //   (see #LEI-344). Be very careful with this flag!
+            sensitive: SENSITIVE_EXCLUSIONS.includes(keyName)
         };
         Object.keys(options).forEach(setOption);
         items.push(ret);
@@ -646,6 +670,9 @@ const Validations = buildValidations(generateValidators(questions));
 
 export default ExpFrameBaseComponent.extend(Validations, {
     type: 'exp-rating-form',
+
+    currentUser: Ember.inject.service(),
+
     layout: layout,
     framePage: 0,
     lastPage: 6,
@@ -656,7 +683,22 @@ export default ExpFrameBaseComponent.extend(Validations, {
     progressBarPage: Ember.computed('framePage', function () {
         return this.framePage + 5;
     }),
-    questions: questions,
+
+    init() {
+        return this._super(...arguments);
+    },
+    questions: Ember.computed('currentUser.isSensitive', function () {
+        // Remove sensitive questions from the list of things to render (validators for them are disabled separately)
+        if (!this.get('currentUser.isSensitive')) {
+            return questions;
+        } else {
+            return questions.map(question => {
+                const questionCopy = Ember.copy(question, true);
+                questionCopy.items = questionCopy.items.filter(item => !SENSITIVE_EXCLUSIONS.includes(item.keyName));
+                return questionCopy;
+            });
+        }
+    }),
     responses: Ember.computed(function () {
         var questions = this.get('questions');
         var responses = {};
