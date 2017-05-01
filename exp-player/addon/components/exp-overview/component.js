@@ -21,6 +21,9 @@ var generateValidators = function (questions) {
         ignoreBlank: true,
         message: 'This field is required'
     });
+
+    // Due to a quirk of how validations are defined, we must manually create the validation key in the
+    //  template. If the validation mechanism in the component changes, the template must also change.
     for (var q = 0; q < questions.length; q++) {
         var isOptional = 'optional' in questions[q] && questions[q].optional;
         if (!isOptional) {

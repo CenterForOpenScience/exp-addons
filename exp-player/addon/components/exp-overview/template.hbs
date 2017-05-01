@@ -2,10 +2,17 @@
     {{page-number pageNumber=pageNumber}}
     <p class="break-line">{{t 'survey.sections.1.instructions'}}</p>
     {{#bs-form}}
-        {{#each questions as |question|}}
-            {{#bs-form-group}}
+        {{#each questions as |question index|}}
+            {{! Due to a quirk of how validations are defined, we must manually create the validation key in the
+            template. If the validation mechanism in the component changes, the template must also change }}
+            {{#bs-form-group
+                validation=(if (v-get this (concat 'questions.' index '.value') 'isValid') "success" "error")
+                useIcons=false
+            }}
                 {{#unless question.optional}}
-                    <label>{{t question.question}}</label>
+                    <label class="control-label">
+                        {{t question.question}}{{unless (v-get this (concat 'questions.' index '.value') 'isValid') '*'}}
+                    </label>
                     {{#if (eq question.type 'radio')}}
                         {{isp-radio-group
                             options=question.scale
@@ -18,11 +25,11 @@
                     {{else if (eq question.type 'select')}}
                         {{select-input options=question.scale value=question.value}}
                     {{else if (eq question.type 'input')}}
-                        {{#input class="form-control auto-width" value=question.value}}{{/input}}
+                        {{input class="form-control auto-width" value=question.value}}
                     {{/if}}
                 {{else if showOptional}}
                     <label>{{t question.question}}</label>
-                    {{#input value=question.value}}{{/input}}
+                    {{input value=question.value}}
                 {{/unless}}
             {{/bs-form-group}}
         {{/each}}
