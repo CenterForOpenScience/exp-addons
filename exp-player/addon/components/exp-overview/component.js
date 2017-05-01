@@ -169,6 +169,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
 
+    // Hide validations until the first time the user clicks "continue"
+    showValidations: false,
+
     showOptional: Ember.computed('questions.9.value', function () {
         return this.questions[9].value === 1;
     }),
@@ -251,6 +254,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
     },
     actions: {
         continue() {
+            // Do not show validations until first time user clicks "next"
+            this.set('showValidations', true);
+
             if (this.get('allowNext')) {
                 this.send('next');
             }

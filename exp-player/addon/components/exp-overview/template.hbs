@@ -6,12 +6,16 @@
             {{! Due to a quirk of how validations are defined, we must manually create the validation key in the
             template. If the validation mechanism in the component changes, the template must also change }}
             {{#bs-form-group
-                validation=(if (v-get this (concat 'questions.' index '.value') 'isValid') "success" "error")
+                validation=(if showValidations (if (v-get this (concat 'questions.' index '.value') 'isValid') "success" "error"))
                 useIcons=false
             }}
                 {{#unless question.optional}}
                     <label class="control-label">
-                        {{t question.question}}{{unless (v-get this (concat 'questions.' index '.value') 'isValid') '*'}}
+                        {{t question.question}}
+                        {{#if showValidations}}
+                            {{unless (v-get this (concat 'questions.' index '.value') 'isValid') '*'}}
+                        {{/if}}
+
                     </label>
                     {{#if (eq question.type 'radio')}}
                         {{isp-radio-group
@@ -36,8 +40,13 @@
     {{/bs-form}}
 </div>
 <div class="row exp-controls">
-    <button class="btn btn-primary pull-right {{if allowNext  "" "disabled"}}" {{ action 'continue' }}>
-        {{t 'global.continueLabel'}}
-    </button>
+    <div class="pull-right">
+        <button class="btn btn-primary" {{ action 'continue' }}>
+            {{t 'global.continueLabel'}}
+        </button>
+        {{#if (and showValidations (not this.validations.isValid))}}
+            <span class="text-danger">*</span>
+        {{/if}}
+    </div>
     {{progress-bar pageNumber=pageNumber}}
 </div>
