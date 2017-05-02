@@ -6,7 +6,7 @@
             {{! Due to a quirk of how validations are defined, we must manually create the validation key in the
             template. If the validation mechanism in the component changes, the template must also change }}
             {{#bs-form-group
-                validation=(if showValidations (if (v-get this (concat 'questions.' index '.value') 'isValid') "success" "error"))
+                validation=(if showValidations (unless (v-get this (concat 'questions.' index '.value') 'isValid') "error"))
                 useIcons=false
             }}
                 {{#unless question.optional}}
@@ -45,7 +45,7 @@
             {{t 'global.continueLabel'}}
         </button>
         {{#if (and showValidations (not this.validations.isValid))}}
-            <span class="text-danger">*</span>
+            <i class="fa fa-exclamation-triangle text-danger" aria-label="Please fill out all required fields (*) to continue."></i>
         {{/if}}
     </div>
     {{progress-bar pageNumber=pageNumber}}

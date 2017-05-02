@@ -129,6 +129,8 @@ export default ExpFrameBaseComponent.extend({
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
 
+    showValidations: false,
+
     pageNumber: Ember.computed('framePage', function() {
         return this.get('framePage') + 3;
     }),
@@ -265,6 +267,9 @@ export default ExpFrameBaseComponent.extend({
             target.unshiftObject(card);
         },
         nextPage() {
+            // Only show validations once button has been clicked at least once
+            this.set('showValidations', true);
+
             if (this.get('allowNext')) {
                 this.set('cardSortResponse', Ember.copy(this.get('bucketsItems'), true));
                 this._save()
@@ -272,8 +277,10 @@ export default ExpFrameBaseComponent.extend({
                         this.set('framePage', 1);
                         this.sendAction('updateFramePage', 1);
                         window.scrollTo(0, 0);
+                        this.set('showValidations', false);
                     })
                     .catch(err => this.displayError(err));
+
             }
         },
         previousPage() {
@@ -284,6 +291,8 @@ export default ExpFrameBaseComponent.extend({
             this.send('previous');
         },
         continue() {
+            // Only show validations once button has been clicked at least once
+            this.set('showValidations', true);
             if (this.get('isValid')) {
                 this.send('next');
             }
