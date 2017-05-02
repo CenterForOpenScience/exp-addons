@@ -120,7 +120,7 @@
                 {{t 'global.continueLabel'}}
             </button>
             {{#if (and showValidations (not allowNext))}}
-                <span class="text-danger"><i class="fa fa-exclamation-triangle"></i></span>
+                <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
             {{/if}}
         </div>
     {{else if (eq framePage 1)}}
@@ -129,7 +129,7 @@
                 {{t 'global.continueLabel'}}
             </button>
             {{#if (and showValidations (not isValid))}}
-                <i class="fa fa-exclamation-triangle text-danger" aria-label="Please fill out all required fields (*) to continue."></i>
+                <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
             {{/if}}
         </div>
     {{/if}}

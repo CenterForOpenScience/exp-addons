@@ -36,6 +36,8 @@ export default ExpFrameBaseComponent.extend(Validations, {
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
 
+    showValidations: false,
+
     diff1: Ember.computed('WhatResponse', function () {
         var length = getLength(this.get('WhatResponse'));
         var message = this.get('i18n').t('survey.sections.2.questions.11.characterCount').string;
@@ -140,6 +142,7 @@ export default ExpFrameBaseComponent.extend(Validations, {
     },
     actions: {
         continue() {
+            this.set('showValidations', true);
             if (this.get('allowNext')) {
                 this.send('next');
             }

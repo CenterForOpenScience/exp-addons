@@ -15,7 +15,6 @@
                         {{#if showValidations}}
                             {{unless (v-get this (concat 'questions.' index '.value') 'isValid') '*'}}
                         {{/if}}
-
                     </label>
                     {{#if (eq question.type 'radio')}}
                         {{isp-radio-group
@@ -45,7 +44,7 @@
             {{t 'global.continueLabel'}}
         </button>
         {{#if (and showValidations (not this.validations.isValid))}}
-            <i class="fa fa-exclamation-triangle text-danger" aria-label="Please fill out all required fields (*) to continue."></i>
+            <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
         {{/if}}
     </div>
     {{progress-bar pageNumber=pageNumber}}
