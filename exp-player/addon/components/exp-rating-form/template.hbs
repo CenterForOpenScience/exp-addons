@@ -4,11 +4,31 @@
         {{#each questions as |question index|}}
             {{#if (eq question.page framePage)}}
                 {{#bs-form-group}}
-                    <label class="break-line question-label">{{add index 1}}. {{t question.question}}</label><br>
+                    <label class="break-line question-label {{unless (eq question.items.length 1) 'control-label'}}">
+                        {{#if (and
+                                  (eq question.items.length 1)
+                                  (not (v-get this (concat 'page.' framePage '.questions.' index  '.items.' 0 '.value') 'isValid'))
+                        )}}
+                            {{! A form group here can be one question, or many. Only color the label if response invalid,
+                                this is a single question (only items.0 exists), AND we want to show validations
+                                This is a hack that hardcodes all kinds of assumptions based on how validators are constructed, etc etc etc etc etc
+                            }}
+                            {{! FIXME: Refactor so that validators are exposed, and can actually be checked in template }}
+                            <span class="validation-error text-danger">{{add index 1}}. {{t question.question}} *</span>
+                        {{else}}
+                            {{add index 1}}. {{t question.question}}
+                        {{/if}}
+                    </label><br>
                     {{#if (eq question.type 'radio')}}
-                        {{#each question.items as |item|}}
+                        {{#each question.items as |item itemIndex|}}
                             {{#if item.description}}
-                                <label>{{t item.description}}</label>
+                                <label class="control-label">
+                                    {{#if (v-get this (concat 'page.' framePage '.questions.' index  '.items.' itemIndex '.value') 'isValid')}}
+                                        {{t item.description}}
+                                    {{else}}
+                                        <span class="validation-error text-danger">{{t item.description}} *</span>
+                                    {{/if}}
+                                </label>
                             {{/if}}
                             {{isp-radio-group options=question.scale labelTop=item.labelTop labels=item.labels
                                               formatLabel=item.formatLabel value=item.value
@@ -23,7 +43,7 @@
                                           value=question.items.0.value}}
                         {{#if (eq question.items.0.value 1)}}
                             <label class="label-margin-top">{{t question.items.1.description}}</label><br>
-                            {{#textarea value=question.items.1.value rows="2" cols="35"}}{{/textarea}}<br>
+                            {{textarea value=question.items.1.value rows="2" cols="35"}}<br>
                             <label class="label-margin-top">{{t question.items.2.description}}</label>
                             {{isp-radio-group options=question.items.2.scale labelTop=question.items.2.labelTop
                                               labels=question.items.2.labels value=question.items.2.value}}
@@ -37,14 +57,16 @@
     {{/bs-form}}
 </div>
 <div class="row exp-controls">
-    <button class='btn btn-primary pull-right {{if allowNext "" "disabled"}}' {{action 'continue'}}>
-        {{t
-        'global.continueLabel'}}
-    </button>
     {{#unless (eq framePage 0)}}
         <button class="btn btn-default" {{ action 'previousPage' }}>
             {{t 'global.previousLabel'}}
         </button>
     {{/unless}}
+    <span class="pull-right">
+        <button class='btn btn-primary' {{action 'continue'}}>
+            {{t
+                'global.continueLabel'}}
+        </button>
+    </span>
     {{progress-bar pageNumber=progressBarPage}}
 </div>

@@ -145,6 +145,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
             this.set('showValidations', true);
             if (this.get('allowNext')) {
                 this.send('next');
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

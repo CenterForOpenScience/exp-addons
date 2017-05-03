@@ -18,7 +18,7 @@
                 {{/draggable-object}}
             {{/each}}
         </div>
-        <h4 class="center {{if (and showValidations (not allowNext)) 'text-danger'}}">{{t 'qsort.sections.1.itemsLeft' count=cards.length}}</h4>
+        <h4 class="center {{if (and showValidations (not allowNext)) 'text-danger validation-error'}}">{{t 'qsort.sections.1.itemsLeft' count=cards.length}}</h4>
     {{/if}}
     <div class="row hidden-xs">
         {{#each bucketsItems as |bucket|}}
@@ -77,7 +77,7 @@
                     <div class="row">
                         {{#each group.categories as |category|}}
                             <div class="col-sm-4 small-bucket
-                                {{unless (eq category.cards.length category.max) 'text-danger'}}
+                                {{unless (eq category.cards.length category.max) 'text-danger validation-error'}}
                                 ">
                                 <h5 class="bucket-label visible-xs {{if
                                     (eq category.name 'qsort.sections.2.categories.neutral') ''
@@ -119,18 +119,12 @@
             <button class="btn btn-primary" {{action "nextPage"}}>
                 {{t 'global.continueLabel'}}
             </button>
-            {{#if (and showValidations (not allowNext))}}
-                <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
-            {{/if}}
         </div>
     {{else if (eq framePage 1)}}
         <div class="pull-right">
             <button class="btn btn-primary" {{ action 'continue' }}>
                 {{t 'global.continueLabel'}}
             </button>
-            {{#if (and showValidations (not isValid))}}
-                <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
-            {{/if}}
         </div>
     {{/if}}
     {{progress-bar pageNumber=pageNumber}}

@@ -5,6 +5,7 @@ import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
 
 import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
+import ScrollToMixin from '../../mixins/scroll-to';
 
 function range(start, stop) {
     var options = [];
@@ -160,7 +161,7 @@ const questions = [
 
 const Validations = buildValidations(generateValidators(questions));
 
-export default ExpFrameBaseComponent.extend(Validations, {
+export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
     type: 'exp-overview',
     layout: layout,
     questions: questions,
@@ -259,6 +260,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
 
             if (this.get('allowNext')) {
                 this.send('next');
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

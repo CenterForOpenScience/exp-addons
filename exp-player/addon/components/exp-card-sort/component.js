@@ -3,6 +3,8 @@ import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
 import layout from './template';
 import config from 'ember-get-config';
 
+import ScrollToMixin from '../../mixins/scroll-to';
+
 // jscs:disable requireDotNotation
 var cards = [
     'qsort.rsq.item.potentiallyEnjoy',
@@ -121,7 +123,7 @@ var shuffle = function (array) {
     return array;
 };
 
-export default ExpFrameBaseComponent.extend({
+export default ExpFrameBaseComponent.extend(ScrollToMixin, {
     type: 'exp-card-sort',
     layout: layout,
     framePage: 0,
@@ -281,6 +283,9 @@ export default ExpFrameBaseComponent.extend({
                     })
                     .catch(err => this.displayError(err));
 
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         },
         previousPage() {

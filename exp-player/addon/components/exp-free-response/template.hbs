@@ -39,8 +39,10 @@
         }}
             <label class="control-label">
                 {{t 'survey.sections.2.questions.11.label'}}
-                {{#if showValidations}}
-                    {{unless (v-get this 'WhatResponse' 'isValid') '*'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhatResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
                 {{/if}}
             </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhatResponse}}{{/textarea}}
@@ -82,9 +84,6 @@
         <button class="btn btn-primary" {{ action 'continue' }}>
             {{t 'global.continueLabel'}}
         </button>
-        {{#if (and showValidations (not this.validations.isValid))}}
-            <i class="fa fa-exclamation-triangle text-danger" aria-label="Please complete all required fields (*) to continue."></i>
-        {{/if}}
     </div>
     {{progress-bar pageNumber=pageNumber}}
 </div>
