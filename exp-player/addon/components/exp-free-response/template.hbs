@@ -11,8 +11,10 @@
         }}
             <label class="control-label">
                 {{t 'survey.sections.2.questions.14.label'}}
-                {{#if showValidations}}
-                    {{unless (v-get this 'EventTime' 'isValid') '*'}}
+                {{#if (and showValidations
+                          (not (v-get this 'EventTime' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
                 {{/if}}
             </label><br>
             <div id="timeSelect" dir="ltr"> {{! Prevent date display from being mangled in RTL languages- TODO improve fix }}
@@ -54,8 +56,10 @@
         }}
             <label class="control-label">
                 {{t 'survey.sections.2.questions.12.label'}}
-                {{#if showValidations}}
-                    {{unless (v-get this 'WhereResponse' 'isValid') '*'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhereResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
                 {{/if}}
             </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhereResponse}}{{/textarea}}
@@ -67,8 +71,10 @@
         }}
             <label class="control-label">
                 {{t 'survey.sections.2.questions.13.label'}}
-                {{#if showValidations}}
-                    {{unless (v-get this 'WhoResponse' 'isValid') '*'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhoResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
                 {{/if}}
             </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhoResponse}}{{/textarea}}

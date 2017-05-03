@@ -6,14 +6,14 @@
                 {{#bs-form-group}}
                     <label class="break-line question-label {{unless (eq question.items.length 1) 'control-label'}}">
                         {{#if (and
+                                  showValidations
                                   (eq question.items.length 1)
-                                  (not (v-get this (concat 'page.' framePage '.questions.' index  '.items.' 0 '.value') 'isValid'))
+                                  (not (v-get this (concat 'questions.' index  '.items.' 0 '.value') 'isValid'))
                         )}}
                             {{! A form group here can be one question, or many. Only color the label if response invalid,
                                 this is a single question (only items.0 exists), AND we want to show validations
                                 This is a hack that hardcodes all kinds of assumptions based on how validators are constructed, etc etc etc etc etc
                             }}
-                            {{! FIXME: Refactor so that validators are exposed, and can actually be checked in template }}
                             <span class="validation-error text-danger">{{add index 1}}. {{t question.question}} *</span>
                         {{else}}
                             {{add index 1}}. {{t question.question}}
@@ -23,10 +23,13 @@
                         {{#each question.items as |item itemIndex|}}
                             {{#if item.description}}
                                 <label class="control-label">
-                                    {{#if (v-get this (concat 'page.' framePage '.questions.' index  '.items.' itemIndex '.value') 'isValid')}}
-                                        {{t item.description}}
-                                    {{else}}
+                                    {{#if (and showValidations
+                                              (not (v-get this (concat 'questions.' index  '.items.' itemIndex '.value') 'isValid')))
+                                    }}
                                         <span class="validation-error text-danger">{{t item.description}} *</span>
+
+                                    {{else}}
+                                        {{t item.description}}
                                     {{/if}}
                                 </label>
                             {{/if}}

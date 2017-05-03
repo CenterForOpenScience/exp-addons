@@ -229,7 +229,6 @@ var generateValidators = function (questions) {
             on: pages[number]
         });
     }
-    debugger;
     return validators;
 };
 
@@ -726,7 +725,6 @@ export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
         continue() {
             this.set('showValidations', true);
 
-            //if (false) { // todo: revert
             if (this.get('allowNext')) {
                 if (this.get('framePage') !== this.get('lastPage')) {
                     this._save()

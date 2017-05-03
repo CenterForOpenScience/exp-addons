@@ -5,6 +5,7 @@ import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
 
 import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
+import ScrollToMixin from '../../mixins/scroll-to';
 
 function getLength(value) {
     var length = 0;
@@ -27,7 +28,7 @@ const Validations = buildValidations({
     EventTime: presence
 });
 
-export default ExpFrameBaseComponent.extend(Validations, {
+export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
     type: 'exp-free-response',
     layout: layout,
     i18n: Ember.inject.service(),
