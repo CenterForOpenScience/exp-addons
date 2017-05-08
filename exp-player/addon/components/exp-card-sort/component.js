@@ -3,6 +3,8 @@ import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
 import layout from './template';
 import config from 'ember-get-config';
 
+import ScrollToMixin from '../../mixins/scroll-to';
+
 // jscs:disable requireDotNotation
 var cards = [
     'qsort.rsq.item.potentiallyEnjoy',
@@ -121,13 +123,15 @@ var shuffle = function (array) {
     return array;
 };
 
-export default ExpFrameBaseComponent.extend({
+export default ExpFrameBaseComponent.extend(ScrollToMixin, {
     type: 'exp-card-sort',
     layout: layout,
     framePage: 0,
 
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
+
+    showValidations: false,
 
     pageNumber: Ember.computed('framePage', function() {
         return this.get('framePage') + 3;
@@ -265,6 +269,9 @@ export default ExpFrameBaseComponent.extend({
             target.unshiftObject(card);
         },
         nextPage() {
+            // Only show validations once button has been clicked at least once
+            this.set('showValidations', true);
+
             if (this.get('allowNext')) {
                 this.set('cardSortResponse', Ember.copy(this.get('bucketsItems'), true));
                 this._save()
@@ -272,8 +279,13 @@ export default ExpFrameBaseComponent.extend({
                         this.set('framePage', 1);
                         this.sendAction('updateFramePage', 1);
                         window.scrollTo(0, 0);
+                        this.set('showValidations', false);
                     })
                     .catch(err => this.displayError(err));
+
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         },
         previousPage() {
@@ -284,8 +296,13 @@ export default ExpFrameBaseComponent.extend({
             this.send('previous');
         },
         continue() {
+            // Only show validations once button has been clicked at least once
+            this.set('showValidations', true);
             if (this.get('isValid')) {
                 this.send('next');
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

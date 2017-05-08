@@ -5,6 +5,7 @@ import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
 
 import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
+import ScrollToMixin from '../../mixins/scroll-to';
 
 function getLength(value) {
     var length = 0;
@@ -27,7 +28,7 @@ const Validations = buildValidations({
     EventTime: presence
 });
 
-export default ExpFrameBaseComponent.extend(Validations, {
+export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
     type: 'exp-free-response',
     layout: layout,
     i18n: Ember.inject.service(),
@@ -35,6 +36,8 @@ export default ExpFrameBaseComponent.extend(Validations, {
 
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
+
+    showValidations: false,
 
     diff1: Ember.computed('WhatResponse', function () {
         var length = getLength(this.get('WhatResponse'));
@@ -140,8 +143,12 @@ export default ExpFrameBaseComponent.extend(Validations, {
     },
     actions: {
         continue() {
+            this.set('showValidations', true);
             if (this.get('allowNext')) {
                 this.send('next');
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

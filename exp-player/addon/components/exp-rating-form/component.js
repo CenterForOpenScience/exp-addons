@@ -5,6 +5,7 @@ import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
 
 import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
+import ScrollToMixin from '../../mixins/scroll-to';
 
 // jscs:disable requireDotNotation
 var items = {
@@ -203,6 +204,8 @@ const SEVEN_POINT_SCALE = TEN_POINT_SCALE.slice(1, 8);
 const NINE_POINT_SCALE = TEN_POINT_SCALE.slice(1, 10);
 
 var generateValidators = function (questions) {
+    // The template contains specific assumptions about how validator keynames are constructed.
+    //   If this code is changed, the template will also need to be changed
     var validators = {};
     var pages = {};
     for (var i = 0; i < questions.length; i++) {
@@ -645,7 +648,7 @@ var questions = [
 
 const Validations = buildValidations(generateValidators(questions));
 
-export default ExpFrameBaseComponent.extend(Validations, {
+export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
     type: 'exp-rating-form',
     layout: layout,
     framePage: 0,
@@ -653,6 +656,8 @@ export default ExpFrameBaseComponent.extend(Validations, {
 
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
+
+    showValidations: false,
 
     progressBarPage: Ember.computed('framePage', function () {
         return this.framePage + 5;
@@ -718,13 +723,15 @@ export default ExpFrameBaseComponent.extend(Validations, {
             window.scrollTo(0, 0);
         },
         continue() {
+            this.set('showValidations', true);
+
             if (this.get('allowNext')) {
                 if (this.get('framePage') !== this.get('lastPage')) {
-
                     this._save()
                         .then(() => {
-                            var page = this.get('framePage') + 1;
+                            const page = this.get('framePage') + 1;
                             this.set('framePage', page);
+                            this.set('showValidations', false);
                             this.sendAction('updateFramePage', page);
                             window.scrollTo(0, 0);
                         })
@@ -733,6 +740,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
                     this.sendAction('sessionCompleted');
                     this.send('next');
                 }
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

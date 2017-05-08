@@ -5,6 +5,7 @@ import {validator, buildValidations} from 'ember-cp-validations';
 import config from 'ember-get-config';
 
 import ExpFrameBaseComponent from '../../components/exp-frame-base/component';
+import ScrollToMixin from '../../mixins/scroll-to';
 
 function range(start, stop) {
     var options = [];
@@ -21,6 +22,9 @@ var generateValidators = function (questions) {
         ignoreBlank: true,
         message: 'This field is required'
     });
+
+    // Due to a quirk of how validations are defined, we must manually create the validation key in the
+    //  template. If the validation mechanism in the component changes, the template must also change.
     for (var q = 0; q < questions.length; q++) {
         var isOptional = 'optional' in questions[q] && questions[q].optional;
         if (!isOptional) {
@@ -157,7 +161,7 @@ const questions = [
 
 const Validations = buildValidations(generateValidators(questions));
 
-export default ExpFrameBaseComponent.extend(Validations, {
+export default ExpFrameBaseComponent.extend(Validations, ScrollToMixin, {
     type: 'exp-overview',
     layout: layout,
     questions: questions,
@@ -165,6 +169,9 @@ export default ExpFrameBaseComponent.extend(Validations, {
 
     extra: {},
     isRTL: Ember.computed.alias('extra.isRTL'),
+
+    // Hide validations until the first time the user clicks "continue"
+    showValidations: false,
 
     showOptional: Ember.computed('questions.9.value', function () {
         return this.questions[9].value === 1;
@@ -248,8 +255,14 @@ export default ExpFrameBaseComponent.extend(Validations, {
     },
     actions: {
         continue() {
+            // Do not show validations until first time user clicks "next"
+            this.set('showValidations', true);
+
             if (this.get('allowNext')) {
                 this.send('next');
+            } else {
+                // Let page rerender (to show validation errors), then scroll to the first one
+                Ember.run.scheduleOnce('afterRender', this, () => this.send('scrollTo', '.validation-error'));
             }
         }
     },

@@ -5,10 +5,21 @@
         <span>{{t 'survey.sections.2.instructions.secondSection'}}</span>
     </p>
     {{#bs-form}}
-        {{#bs-form-group}}
-            <label>{{t 'survey.sections.2.questions.14.label'}}</label><br>
+        {{#bs-form-group
+            validation=(if showValidations (unless (v-get this 'EventTime' 'isValid') "error"))
+            useIcons=false
+        }}
+            <label class="control-label">
+                {{t 'survey.sections.2.questions.14.label'}}
+                {{#if (and showValidations
+                          (not (v-get this 'EventTime' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
+                {{/if}}
+            </label><br>
             <div id="timeSelect" dir="ltr"> {{! Prevent date display from being mangled in RTL languages- TODO improve fix }}
                 {{#power-select
+                    class='form-control'
                     dropdownClass='dropdownClass'
                     selected=EventTime
                     options=times
@@ -24,18 +35,48 @@
             </div>
         {{/bs-form-group}}
         <p>{{t 'survey.sections.2.instructions.thirdSection'}}</p>
-        {{#bs-form-group}}
-            <label>{{t 'survey.sections.2.questions.11.label'}}</label>
+        {{#bs-form-group
+            validation=(if showValidations (unless (v-get this 'WhatResponse' 'isValid') "error"))
+            useIcons=false
+        }}
+            <label class="control-label">
+                {{t 'survey.sections.2.questions.11.label'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhatResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
+                {{/if}}
+            </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhatResponse}}{{/textarea}}
             <p class="text-muted">{{diff1}}</p>
         {{/bs-form-group}}
-        {{#bs-form-group}}
-            <label>{{t 'survey.sections.2.questions.12.label'}}</label>
+        {{#bs-form-group
+            useIcons=false
+            validation=(if showValidations (unless (v-get this 'WhereResponse' 'isValid') "error"))
+        }}
+            <label class="control-label">
+                {{t 'survey.sections.2.questions.12.label'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhereResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
+                {{/if}}
+            </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhereResponse}}{{/textarea}}
             <p class="text-muted">{{diff2}}</p>
         {{/bs-form-group}}
-        {{#bs-form-group}}
-            <label>{{t 'survey.sections.2.questions.13.label'}}</label>
+        {{#bs-form-group
+            useIcons=false
+            validation=(if showValidations (unless (v-get this 'WhoResponse' 'isValid') "error"))
+        }}
+            <label class="control-label">
+                {{t 'survey.sections.2.questions.13.label'}}
+                {{#if (and showValidations
+                          (not (v-get this 'WhoResponse' 'isValid'))
+                      )}}
+                    <span class="validation-error">*</span>
+                {{/if}}
+            </label>
             {{#textarea maxlength=75 rows="5" cols="40" class="form-control" value=WhoResponse}}{{/textarea}}
             <p class="text-muted">{{diff3}}</p>
         {{/bs-form-group}}
@@ -45,8 +86,10 @@
     <button class="btn btn-default" {{ action 'previous' }}>
         {{t 'global.previousLabel'}}
     </button>
-    <button class="btn btn-primary pull-right {{if allowNext "" "disabled"}}" {{ action 'continue' }}>
-        {{t 'global.continueLabel'}}
-    </button>
+    <div class="pull-right">
+        <button class="btn btn-primary" {{ action 'continue' }}>
+            {{t 'global.continueLabel'}}
+        </button>
+    </div>
     {{progress-bar pageNumber=pageNumber}}
 </div>

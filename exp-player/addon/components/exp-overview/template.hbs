@@ -2,10 +2,22 @@
     {{page-number pageNumber=pageNumber}}
     <p class="break-line">{{t 'survey.sections.1.instructions'}}</p>
     {{#bs-form}}
-        {{#each questions as |question|}}
-            {{#bs-form-group}}
+        {{#each questions as |question index|}}
+            {{! Due to a quirk of how validations are defined, we must manually create the validation key in the
+            template. If the validation mechanism in the component changes, the template must also change }}
+            {{#bs-form-group
+                validation=(if showValidations (unless (v-get this (concat 'questions.' index '.value') 'isValid') "error"))
+                useIcons=false
+            }}
                 {{#unless question.optional}}
-                    <label>{{t question.question}}</label>
+                    <label class="control-label">
+                        {{t question.question}}
+                        {{#if showValidations}}
+                            {{#unless (v-get this (concat 'questions.' index '.value') 'isValid')}}
+                                <span class="validation-error">*</span>
+                            {{/unless}}
+                        {{/if}}
+                    </label>
                     {{#if (eq question.type 'radio')}}
                         {{isp-radio-group
                             options=question.scale
@@ -18,19 +30,21 @@
                     {{else if (eq question.type 'select')}}
                         {{select-input options=question.scale value=question.value}}
                     {{else if (eq question.type 'input')}}
-                        {{#input class="form-control auto-width" value=question.value}}{{/input}}
+                        {{input class="form-control auto-width" value=question.value}}
                     {{/if}}
                 {{else if showOptional}}
                     <label>{{t question.question}}</label>
-                    {{#input value=question.value}}{{/input}}
+                    {{input value=question.value}}
                 {{/unless}}
             {{/bs-form-group}}
         {{/each}}
     {{/bs-form}}
 </div>
 <div class="row exp-controls">
-    <button class="btn btn-primary pull-right {{if allowNext  "" "disabled"}}" {{ action 'continue' }}>
-        {{t 'global.continueLabel'}}
-    </button>
+    <span class="pull-right">
+        <button class="btn btn-primary" {{ action 'continue' }}>
+            {{t 'global.continueLabel'}}
+        </button>
+    </span>
     {{progress-bar pageNumber=pageNumber}}
 </div>
