@@ -448,6 +448,7 @@ export default ExpFrameBaseComponent.extend(ScrollToMixin, {
                 let name = bucket.name.split('.').pop();
                 Ember.set(bucket, 'cards', buckets[name]);
             }
+            this.set('cardSortResponse', Ember.copy(this.get('bucketsItems'), true));
         }
     }
 });
