@@ -2,8 +2,21 @@
 
 A shared home for all of our shared addons
 
-**For historical reasons, all PRs targeted to ISP must be aimed at the "ISP" branch**.
+**N.B.** For historical reasons, the various COS projects that use exp-addons all have their own bespoke branch within the repo.  Fixes for each project should be merged into the corresponding branch, then the project's submodule updated to match.  Here are the mappings:
 
+```
++--------------------------+--------------------------+
+| Project                  | Branch                   |
++--------------------------+--------------------------+
+| ISP                      | isp                      |
+| old Experimenter         | experimenter             |
+| old Lookit               | lookit                   |
+| ember-lookit-frameplayer | ember-lookit-frameplayer |
+| new Lookit               | develop                  |
++--------------------------+--------------------------+
+```
+
+Fixes that apply to multiple branches should be committed separately on each branch.
 
 # Installation
 
