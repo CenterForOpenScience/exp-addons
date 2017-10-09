@@ -33,7 +33,7 @@ export default DS.Store.extend({
      */
     queryEverything(collectionName, params, options={}) {
         const results = Ember.A();
-        options = Object.assign({}, {'page[size]': 500}, options);
+        options = Object.assign({}, {'page[size]': 100}, options);
         return this._queryEverythingHelper(collectionName, results, params, options);
     }
 
