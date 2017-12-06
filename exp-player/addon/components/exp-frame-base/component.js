@@ -136,7 +136,7 @@ export default Ember.Component.extend({
     displayError(error) { // jshint ignore:line
         // If the save failure was a server error, warn the user. This error should never disappear.
         const msg = 'If this problem persists, please contact your study coordinator.';
-        this.get('toast').error(msg, 'Error: Could not save data', {timeOut: 0, extendedTimeOut: 0});
+        this.get('toast').error(msg, 'Connection problem. Please try again.', {timeOut: 0, extendedTimeOut: 0});
     },
 
     setupParams(clean) {
